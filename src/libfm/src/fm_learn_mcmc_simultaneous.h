@@ -243,7 +243,7 @@ class fm_learn_mcmc_simultaneous : public fm_learn_mcmc {
 					 _evaluate_class(pred_sum_all, test.target, 1.0/(i+1), acc_test_all, ll_test_all, num_eval_cases);
 					 _evaluate_class(pred_sum_all_but5, test.target, 1.0/(i-5+1), acc_test_all_but5, ll_test_all_but5, num_eval_cases);
 
-					std::cout << "#Iter=" << std::setw(3) << i << "\tTrain=" << acc_train << "\tTest=" << acc_test_all << "\tTest(ll)=" << ll_test_all << std::endl;
+					std::cout << "#Iter=" << std::setw(3) << i << "\tTrain=" << acc_train << "\tTest=" << acc_test_all << "\tTest(ll)=" << ll_test_this << std::endl;
 
 					if (log != NULL) {
 						log->log("accuracy", acc_test_all);
@@ -304,7 +304,7 @@ class fm_learn_mcmc_simultaneous : public fm_learn_mcmc {
 				double pll = p;
 				if (pll > 0.99) { pll = 0.99; }
 				if (pll < 0.01) { pll = 0.01; }
-				_loglikelihood -= m*log10(pll) + (1-m)*log10(1-pll);
+				_loglikelihood -= m* std::log(pll) + (1-m)* std::log(1-pll);
 				num_cases++;
 			} 
 			loglikelihood = _loglikelihood/num_cases;
