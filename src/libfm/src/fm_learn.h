@@ -83,7 +83,8 @@ class fm_learn {
 			if (task == TASK_REGRESSION) {
 				return evaluate_regression(data);
 			} else if (task == TASK_CLASSIFICATION) {
-				return evaluate_classification(data);
+				return evaluate_logloss(data);
+// 				return evaluate_classification(data);
 			} else {
 				throw "unknown task";
 			}
@@ -119,6 +120,32 @@ class fm_learn {
 
 			return (double) num_correct / (double) data.data->getNumRows();
 		}
+	
+		/**
+		 * Jiaming Zhang
+		 * Evaluation the log loss
+		 * @param  data [data]
+		 * @return      [log loss]
+		 */
+		virtual double evaluate_logloss(Data& data) {
+			double _logloss = 0.0;  // log loss
+			int numCase = 0;
+			for (data.data->begin(); !data.data->end(); data.data->next())
+			{
+				double p = predict_case(data);
+				p = 1.0 / (1.0 + exp(-p));
+
+				double pll = p;
+				if (pll > 1.0 - 1e-15) { pll = 1.0 - 1e-15; }
+				if (pll < 1e-15) 	   { pll = 1e-15; }
+
+				double m = (data.target(data.data->getRowIndex()) + 1.0) * 0.5;
+				numCase++;
+				_logloss -= m * std::log(pll) + (1-m) * std::log(1-pll);
+			}
+			return _logloss / numCase;
+		}
+	
 		virtual double evaluate_regression(Data& data) {
 			double rmse_sum_sqr = 0;
 			double mae_sum_abs = 0;
